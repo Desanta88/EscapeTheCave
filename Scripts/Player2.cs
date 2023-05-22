@@ -19,13 +19,14 @@ public class Player2 : KinematicBody2D
      private float gravity;
      private bool isGrounded=true;
 
-     public PlayerC p=new PlayerC(5,1.2F);
+     public PlayerC p;
 
      private AnimatedSprite an;
      private AnimationTree tree;
      Vector2 v;
      AnimationNodeStateMachinePlayback FSM;
      Vector2 velocity;
+     CollisionShape2D coll;
     public override void _Ready()
     {
         an=this.GetNode<AnimatedSprite>("AnimatedSprite");
@@ -34,6 +35,7 @@ public class Player2 : KinematicBody2D
         FSM = (AnimationNodeStateMachinePlayback)tree.Get("parameters/playback");
         FSM.Start("Idle");
         velocity=new Vector2();
+        p=new PlayerC(5,1.2F);
 
     }
 
@@ -47,13 +49,13 @@ public class Player2 : KinematicBody2D
 
             this.Position+=Vector2.Right*movementspeed*delta;
             //velocity.x+=movementspeed;
-            an.Scale=Vector2.One;
+            an.FlipH=false;
             FSM.Travel("Run");
         }
         else if(Input.IsKeyPressed((int)KeyList.A)){
             this.Position+=Vector2.Left*movementspeed*delta;
             //velocity.x-=movementspeed;
-            an.Scale=v;
+            an.FlipH=true;
             FSM.Travel("Run");
         }
         else
@@ -69,6 +71,7 @@ public class Player2 : KinematicBody2D
         velocity=MoveAndSlide(velocity,Vector2.Up);
         PlayJumping();
         Attacking();
+        
   }
     public void PlayJumping(){
         if(IsOnFloor())
@@ -88,6 +91,22 @@ public class Player2 : KinematicBody2D
         else if(Input.IsActionJustPressed("Attack") && isGrounded==false){
              FSM.Travel("AirAttack");
         }
+    }
+    public void _on_HurtBox_body_entered(Node body){
+
+        if(!(body is Enemy))
+            return;
+        GD.Print("Collision");
+        Hurt();
+    }
+    public void Hurt(){
+        CallDeferred("free");
+    }
+    public void _on_EnemyHit_body_entered(Node body){
+        if(!(body is Enemy))
+            return;
+        Enemy e=(Enemy)body;
+        e.Hurt();        
     }
 }
 

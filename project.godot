@@ -30,6 +30,12 @@ Attack={
  ]
 }
 
+[layer_names]
+
+2d_render/layer_1="cave"
+2d_render/layer_2="player"
+2d_render/layer_3="enemies"
+
 [mono]
 
 project/assembly_name="EscapeTheCave"
