@@ -18,7 +18,7 @@ public class Enemy : KinematicBody2D
     private RayCast2D rayCastForward;
 
     private AnimatedSprite an;
-    private EnemyC e;
+    public Global gg;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -31,7 +31,7 @@ public class Enemy : KinematicBody2D
         rayCastsDown[1]=this.GetNode<RayCast2D>("RayCastRight");
         rayCastForward=this.GetNode<RayCast2D>("RayCastForward");
         an=this.GetNode<AnimatedSprite>("AnimatedSprite");
-        e=new EnemyC(10f);
+        gg=GetNode<Global>("/root/Global");
 
 
     }

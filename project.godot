@@ -11,7 +11,12 @@ config_version=4
 [application]
 
 config/name="EscapeTheCave"
+run/main_scene="res://Cave.tscn"
 config/icon="res://icon.png"
+
+[autoload]
+
+Global="*res://Scripts/Global.cs"
 
 [gui]
 

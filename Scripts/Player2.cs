@@ -14,28 +14,25 @@ public class Player2 : KinematicBody2D
      [Export]
      public float timeJumpApex;
 
-     public float jumpForce;
+     private float jumpForce;
 
      private float gravity;
      private bool isGrounded=true;
 
-     public PlayerC p;
-
      private AnimatedSprite an;
      private AnimationTree tree;
-     Vector2 v;
-     AnimationNodeStateMachinePlayback FSM;
-     Vector2 velocity;
-     CollisionShape2D coll;
+     private AnimationNodeStateMachinePlayback FSM;
+     private Vector2 velocity;
+
+     public Global g;
     public override void _Ready()
     {
         an=this.GetNode<AnimatedSprite>("AnimatedSprite");
-        v=new Vector2(-1,1);
         tree=this.GetNode<AnimationTree>("AnimationTree");
         FSM = (AnimationNodeStateMachinePlayback)tree.Get("parameters/playback");
         FSM.Start("Idle");
         velocity=new Vector2();
-        p=new PlayerC(5,1.2F);
+        g=GetNode<Global>("/root/Global");
 
     }
 
@@ -73,7 +70,7 @@ public class Player2 : KinematicBody2D
         Attacking();
         
   }
-    public void PlayJumping(){
+    private void PlayJumping(){
         if(IsOnFloor())
             isGrounded=true;
         else{
@@ -84,7 +81,7 @@ public class Player2 : KinematicBody2D
                 FSM.Travel("Fall");
         }
     }
-    public void Attacking(){
+    private void Attacking(){
         if(Input.IsActionJustPressed("Attack") && isGrounded){
              FSM.Travel("Attack");
         }
@@ -92,17 +89,20 @@ public class Player2 : KinematicBody2D
              FSM.Travel("AirAttack");
         }
     }
-    public void _on_HurtBox_body_entered(Node body){
+    private void _on_HurtBox_body_entered(Node body){
 
         if(!(body is Enemy))
             return;
         GD.Print("Collision");
         Hurt();
     }
-    public void Hurt(){
-        CallDeferred("free");
+    private void Hurt(){
+        g.p.Health--;
+        g.LoseHeart();
+        if( g.p.Health<=0)
+            CallDeferred("free");
     }
-    public void _on_EnemyHit_body_entered(Node body){
+    private void _on_EnemyHit_body_entered(Node body){
         if(!(body is Enemy))
             return;
         Enemy e=(Enemy)body;
