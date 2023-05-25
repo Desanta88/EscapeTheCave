@@ -1,4 +1,4 @@
-[gd_scene load_steps=54 format=2]
+[gd_scene load_steps=58 format=2]
 
 [ext_resource path="res://GameAssets/EnemiesAssets/Goblin/Idle.png" type="Texture" id=1]
 [ext_resource path="res://GameAssets/EnemiesAssets/Goblin/Take Hit.png" type="Texture" id=2]
@@ -149,42 +149,42 @@ animations = [ {
 
 [sub_resource type="Animation" id=36]
 resource_name = "Attack"
-length = 0.5
+length = 0.8
 tracks/0/type = "value"
-tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/path = NodePath("CollisionShape2D:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "Attack" ]
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 654, 403 ), Vector2( 649.5, 403 ), Vector2( 649.5, 403 ), Vector2( 649.5, 403 ), Vector2( 647.7, 403 ), Vector2( 647, 403 ), Vector2( 642.5, 403 ), Vector2( 642.5, 403 ), Vector2( 649.5, 403 ) ]
 }
 tracks/1/type = "value"
-tracks/1/path = NodePath("AnimatedSprite:frame")
+tracks/1/path = NodePath("AnimatedSprite:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/imported = false
 tracks/1/enabled = true
 tracks/1/keys = {
-"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5 ),
-"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
 "update": 1,
-"values": [ 1, 2, 3, 4, 5, 6 ]
+"values": [ "Attack" ]
 }
 tracks/2/type = "value"
-tracks/2/path = NodePath("CollisionShape2D:position")
+tracks/2/path = NodePath("AnimatedSprite:frame")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/imported = false
 tracks/2/enabled = true
 tracks/2/keys = {
-"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5 ),
-"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
-"update": 0,
-"values": [ Vector2( 649.5, 403 ), Vector2( 649.5, 403 ), Vector2( 649.5, 403 ), Vector2( 649.5, 403 ), Vector2( 647.7, 403 ), Vector2( 641.7, 403 ) ]
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 3, 4, 5, 6, 7, 0 ]
 }
 
 [sub_resource type="Animation" id=35]
@@ -218,6 +218,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=31]
 resource_name = "Idle"
 length = 0.4
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -401,24 +402,36 @@ animation = "TakeHit"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=47]
 
+[sub_resource type="AnimationNodeStateMachineTransition" id=48]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=49]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=50]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=51]
+switch_mode = 2
+
 [sub_resource type="AnimationNodeStateMachine" id=37]
 states/Attack/node = SubResource( 39 )
-states/Attack/position = Vector2( 702.556, 101.667 )
+states/Attack/position = Vector2( 700.926, 101.667 )
 states/Death/node = SubResource( 40 )
-states/Death/position = Vector2( 911, 242.111 )
+states/Death/position = Vector2( 911, 241.075 )
 states/Idle/node = SubResource( 41 )
 states/Idle/position = Vector2( 520.333, 184.333 )
 states/Run/node = SubResource( 42 )
-states/Run/position = Vector2( 701.667, 241.667 )
+states/Run/position = Vector2( 701.009, 241.437 )
 states/TakeHit/node = SubResource( 43 )
 states/TakeHit/position = Vector2( 916.333, 157.667 )
-transitions = [ "Idle", "Attack", SubResource( 44 ), "Idle", "Run", SubResource( 45 ), "Run", "Death", SubResource( 46 ), "Run", "TakeHit", SubResource( 47 ) ]
+transitions = [ "Idle", "Attack", SubResource( 44 ), "Idle", "Run", SubResource( 45 ), "Run", "Death", SubResource( 46 ), "Run", "TakeHit", SubResource( 47 ), "Attack", "Idle", SubResource( 48 ), "Run", "Idle", SubResource( 49 ), "Run", "Attack", SubResource( 50 ), "Attack", "Run", SubResource( 51 ) ]
 graph_offset = Vector2( 161.784, 69 )
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id=38]
 
 [node name="Goblin" type="KinematicBody2D"]
 collision_layer = 4
+collision_mask = 3
 script = ExtResource( 6 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
@@ -435,13 +448,14 @@ anims/Run = SubResource( 33 )
 anims/TakeHit = SubResource( 34 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( 648, 403 )
+position = Vector2( 648.5, 403 )
 scale = Vector2( 0.8, 1.55 )
 shape = SubResource( 30 )
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource( 37 )
 anim_player = NodePath("../AnimationPlayer")
+active = true
 parameters/playback = SubResource( 38 )
 
 [node name="RayCastForward" type="RayCast2D" parent="."]
@@ -452,7 +466,17 @@ cast_to = Vector2( 20, 0 )
 [node name="RayCastRight" type="RayCast2D" parent="."]
 position = Vector2( 670, 393 )
 enabled = true
+collision_mask = 3
 
 [node name="RayCastLeft" type="RayCast2D" parent="."]
 position = Vector2( 624, 393 )
 enabled = true
+
+[node name="RayCastDistance" type="RayCast2D" parent="."]
+position = Vector2( 631, 399 )
+cast_to = Vector2( -50, 0 )
+collision_mask = 2
+
+[node name="AttackWaitTime" type="Timer" parent="."]
+
+[connection signal="timeout" from="AttackWaitTime" to="." method="onAttackWaitTimetimeout"]

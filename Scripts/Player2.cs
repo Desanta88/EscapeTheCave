@@ -22,7 +22,11 @@ public class Player2 : KinematicBody2D
      private AnimatedSprite an;
      private AnimationTree tree;
      private AnimationNodeStateMachinePlayback FSM;
+
+     private RayCast2D rayCastGround;
+     private RayCast2D rayCastDistance;
      private Vector2 velocity;
+     private Enemy e;
 
      public Global g;
     public override void _Ready()
@@ -33,6 +37,8 @@ public class Player2 : KinematicBody2D
         FSM.Start("Idle");
         velocity=new Vector2();
         g=GetNode<Global>("/root/Global");
+        rayCastGround=this.GetNode<RayCast2D>("RayCastGround");
+        rayCastDistance=this.GetNode<RayCast2D>("RayCastDistance");
 
     }
 
@@ -68,10 +74,11 @@ public class Player2 : KinematicBody2D
         velocity=MoveAndSlide(velocity,Vector2.Up);
         PlayJumping();
         Attacking();
+        Stop();
         
   }
     private void PlayJumping(){
-        if(IsOnFloor())
+        if(rayCastGround.IsColliding())
             isGrounded=true;
         else{
             isGrounded=false;
@@ -93,7 +100,7 @@ public class Player2 : KinematicBody2D
 
         if(!(body is Enemy))
             return;
-        GD.Print("Collision");
+        //GD.Print("Collision");
         Hurt();
     }
     private void Hurt(){
@@ -107,6 +114,20 @@ public class Player2 : KinematicBody2D
             return;
         Enemy e=(Enemy)body;
         e.Hurt();        
+    }
+    private void _on_Area2D_body_entered(Node body){
+        if(!(body is Player2))
+            return;
+        GD.Print("Caduto");       
+    }
+    private void Stop(){
+        if(rayCastDistance.IsColliding()){
+            e=(Enemy)rayCastDistance.GetCollider();
+            e.movementspeed=0;
+            //e.FSME.Travel("Idle");
+           // e.FSME.Travel("Attack");
+            //e.movementspeed=100;
+        }
     }
 }
 
