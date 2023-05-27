@@ -758,5 +758,11 @@ enabled = true
 cast_to = Vector2( 50, 0 )
 collision_mask = 4
 
+[node name="RayCastAttack" type="RayCast2D" parent="."]
+position = Vector2( 466.376, 289.336 )
+enabled = true
+cast_to = Vector2( 37, 0 )
+collision_mask = 4
+
 [connection signal="body_entered" from="HurtBox" to="." method="_on_HurtBox_body_entered"]
 [connection signal="body_entered" from="EnemyHit" to="." method="_on_EnemyHit_body_entered"]

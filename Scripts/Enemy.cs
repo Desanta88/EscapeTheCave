@@ -8,7 +8,7 @@ public class Enemy : KinematicBody2D
      private float gravity=9.81f;
 
      private float mass=15f;
-     private int direzione=-1;
+     public int direzione=-1;
 
     public Vector2 move;
     private AnimationTree tree;
@@ -21,7 +21,8 @@ public class Enemy : KinematicBody2D
     public Global gg;
 
     public RayCast2D rayCastDistance;
-    public Timer T=new Timer();
+    float hp;
+   // public Timer T=new Timer();
     
 
     // Called when the node enters the scene tree for the first time.
@@ -37,7 +38,8 @@ public class Enemy : KinematicBody2D
         rayCastDistance=this.GetNode<RayCast2D>("RayCastDistance");
         an=this.GetNode<AnimatedSprite>("AnimatedSprite");
         gg=GetNode<Global>("/root/Global");
-        AddChild(T);
+       // AddChild(T);
+       hp=gg.e.Health;
     }
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -54,7 +56,12 @@ public class Enemy : KinematicBody2D
         rayCastForward.CastTo=new Vector2(20*direzione,0);
         an.Scale=v;
       }
-      StopAnim();
+      if(hp>gg.e.Health){
+         FSME.Travel("TakeHit");
+         GD.Print("Remaining hp:"+gg.e.Health);
+         hp=gg.e.Health;
+      }
+      //StopAnim();
   }
 
   public bool shouldTurn(){
@@ -71,17 +78,21 @@ public class Enemy : KinematicBody2D
 
     return false;
   }
-  public void Hurt(){
-    CallDeferred("free");
+  public void Hurt(float dmg){
+    gg.e.Health-=dmg;
+    GD.Print("ow");
+   // this.Position+=new Vector2((direzione*-1)*100,0);
+    if(gg.e.Health<=0)
+      CallDeferred("free");
   }
   private void StopAnim(){
-        Timer T=new Timer();
-        T.WaitTime=1;
-        AddChild(T);
-        Timer[] arr=new Timer[1]{T};
-        T.Connect("timeout",this,"onAttackWaitTimetimeout");
+        //Timer T=new Timer();
+        //T.WaitTime=1;
+       // AddChild(T);
+       // Timer[] arr=new Timer[1]{T};
+        //T.Connect("timeout",this,"onAttackWaitTimetimeout");
         if(movementspeed==0){
-            T.Start();
+           // T.Start();
             FSME.Travel("Idle");
             FSME.Travel("Attack");
            // waitTime.Connect("timeout",this,"onAttackWaitTimetimeout");
@@ -93,9 +104,7 @@ public class Enemy : KinematicBody2D
       movementspeed=100;
       //GD.Print(movementspeed);
      // waitTime.Paused=true;
-      T.Stop();
-      T=null;
-      
-
+     // T.Stop();
+      //T=null;
   }
 }

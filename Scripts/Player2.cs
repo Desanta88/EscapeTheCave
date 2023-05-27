@@ -16,6 +16,8 @@ public class Player2 : KinematicBody2D
 
      private float jumpForce;
 
+     private float Knockback,Knockup;
+     private int hp;
      private float gravity;
      private bool isGrounded=true;
 
@@ -25,6 +27,8 @@ public class Player2 : KinematicBody2D
 
      private RayCast2D rayCastGround;
      private RayCast2D rayCastDistance;
+
+     private RayCast2D rayCastAttack;
      private Vector2 velocity;
      private Enemy e;
 
@@ -39,6 +43,10 @@ public class Player2 : KinematicBody2D
         g=GetNode<Global>("/root/Global");
         rayCastGround=this.GetNode<RayCast2D>("RayCastGround");
         rayCastDistance=this.GetNode<RayCast2D>("RayCastDistance");
+        rayCastAttack=this.GetNode<RayCast2D>("RayCastAttack");
+        Knockback=300;
+        Knockup=50;
+        hp=g.p.Health;
 
     }
 
@@ -54,12 +62,16 @@ public class Player2 : KinematicBody2D
             //velocity.x+=movementspeed;
             an.FlipH=false;
             FSM.Travel("Run");
+            rayCastAttack.CastTo=new Vector2(36.715f,0);
+           
         }
         else if(Input.IsKeyPressed((int)KeyList.A)){
             this.Position+=Vector2.Left*movementspeed*delta;
             //velocity.x-=movementspeed;
             an.FlipH=true;
             FSM.Travel("Run");
+            rayCastAttack.CastTo=new Vector2(-36.715f,0);
+       
         }
         else
             FSM.Travel("Idle"); 
@@ -74,7 +86,10 @@ public class Player2 : KinematicBody2D
         velocity=MoveAndSlide(velocity,Vector2.Up);
         PlayJumping();
         Attacking();
-        Stop();
+        if(hp>g.p.Health){
+            hp=g.p.Health;
+        }
+        //Stop();
         
   }
     private void PlayJumping(){
@@ -91,10 +106,13 @@ public class Player2 : KinematicBody2D
     private void Attacking(){
         if(Input.IsActionJustPressed("Attack") && isGrounded){
              FSM.Travel("Attack");
+             AttackColliding();
         }
         else if(Input.IsActionJustPressed("Attack") && isGrounded==false){
              FSM.Travel("AirAttack");
+             AttackColliding();
         }
+
     }
     private void _on_HurtBox_body_entered(Node body){
 
@@ -102,6 +120,9 @@ public class Player2 : KinematicBody2D
             return;
         //GD.Print("Collision");
         Hurt();
+        this.Position-=new Vector2(Knockback,0);
+        this.Position=new Vector2(Knockup,0);
+        //velocity=MoveAndSlide(velocity,Vector2.Up);
     }
     private void Hurt(){
         g.p.Health--;
@@ -109,12 +130,12 @@ public class Player2 : KinematicBody2D
         if( g.p.Health<=0)
             CallDeferred("free");
     }
-    private void _on_EnemyHit_body_entered(Node body){
+   /* private void _on_EnemyHit_body_entered(Node body){
         if(!(body is Enemy))
             return;
         Enemy e=(Enemy)body;
         e.Hurt();        
-    }
+    }*/
     private void _on_Area2D_body_entered(Node body){
         if(!(body is Player2))
             return;
@@ -127,6 +148,16 @@ public class Player2 : KinematicBody2D
             //e.FSME.Travel("Idle");
            // e.FSME.Travel("Attack");
             //e.movementspeed=100;
+        }
+    }
+    private void AttackColliding(){
+        if(rayCastAttack.IsColliding()){
+            Enemy e=(Enemy)rayCastAttack.GetCollider();
+            g.p.setCritDmg();
+            e.Hurt(g.p.DamageDeal);
+            GD.Print(rayCastAttack.CastTo.x);   
+            e.Position+=new Vector2((rayCastAttack.CastTo.x+100),0);
+            GD.Print(e.Position);    
         }
     }
 }
