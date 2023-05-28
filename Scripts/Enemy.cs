@@ -5,9 +5,11 @@ public class Enemy : KinematicBody2D
 {
     [Export]
      public int movementspeed=100;
+
      private float gravity=9.81f;
 
-     private float mass=15f;
+    [Export]
+     public float mass=15f;
      public int direzione=-1;
 
     public Vector2 move;
@@ -19,10 +21,12 @@ public class Enemy : KinematicBody2D
     
     private AnimatedSprite an;
     public Global gg;
-
-    public RayCast2D rayCastDistance;
     float hp;
-   // public Timer T=new Timer();
+    int player_dir;
+    public Vector2 knockback_dir=Vector2.Zero;
+
+    private AnimatedSprite p;
+
     
 
     // Called when the node enters the scene tree for the first time.
@@ -35,11 +39,10 @@ public class Enemy : KinematicBody2D
         rayCastsDown[0]=this.GetNode<RayCast2D>("RayCastLeft");
         rayCastsDown[1]=this.GetNode<RayCast2D>("RayCastRight");
         rayCastForward=this.GetNode<RayCast2D>("RayCastForward");
-        rayCastDistance=this.GetNode<RayCast2D>("RayCastDistance");
         an=this.GetNode<AnimatedSprite>("AnimatedSprite");
         gg=GetNode<Global>("/root/Global");
-       // AddChild(T);
-       hp=gg.e.Health;
+        hp=gg.e.Health;
+        p=(AnimatedSprite)GetNode<Player2>("../Player2").an;
     }
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -50,26 +53,24 @@ public class Enemy : KinematicBody2D
       move.x=movementspeed*direzione;
       MoveAndSlide(move);
       FSME.Travel("Run");
+      
       rayCastForward.CastTo=new Vector2(20*direzione,0);
       if(shouldTurn()){
         direzione*=-1;
+        knockback_dir=new Vector2(direzione,0);
         rayCastForward.CastTo=new Vector2(20*direzione,0);
         an.Scale=v;
       }
       if(hp>gg.e.Health){
          FSME.Travel("TakeHit");
-         GD.Print("Remaining hp:"+gg.e.Health);
          hp=gg.e.Health;
       }
-      //StopAnim();
   }
 
   public bool shouldTurn(){
     if(rayCastForward.IsColliding()){
-      GD.Print("turn");
       return true;
     }
-        //return true; 
 
     if(direzione==-1)
         return !rayCastsDown[0].IsColliding();
@@ -80,31 +81,7 @@ public class Enemy : KinematicBody2D
   }
   public void Hurt(float dmg){
     gg.e.Health-=dmg;
-    GD.Print("ow");
-   // this.Position+=new Vector2((direzione*-1)*100,0);
     if(gg.e.Health<=0)
       CallDeferred("free");
-  }
-  private void StopAnim(){
-        //Timer T=new Timer();
-        //T.WaitTime=1;
-       // AddChild(T);
-       // Timer[] arr=new Timer[1]{T};
-        //T.Connect("timeout",this,"onAttackWaitTimetimeout");
-        if(movementspeed==0){
-           // T.Start();
-            FSME.Travel("Idle");
-            FSME.Travel("Attack");
-           // waitTime.Connect("timeout",this,"onAttackWaitTimetimeout");
-        }
-  }
-  private void onAttackWaitTimetimeout(){
-      FSME.Travel("Idle");
-      GD.Print("yay");
-      movementspeed=100;
-      //GD.Print(movementspeed);
-     // waitTime.Paused=true;
-     // T.Stop();
-      //T=null;
   }
 }

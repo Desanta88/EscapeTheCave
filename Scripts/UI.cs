@@ -19,7 +19,6 @@ public class UI : CanvasLayer
     }
 
     public void LoadHearts(){
-        GD.Print(h.p.Health);
         HeartsFull.RectSize=new Vector2(h.p.Health*17,0);
         if(h.p.Health<=0)
             HeartsFull.Visible=false;
